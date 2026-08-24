@@ -3,6 +3,7 @@
 This is the backend service for the Prameela OneSuite company management application, built with [NestJS](https://nestjs.com/) and [Prisma ORM](https://www.prisma.io/).
 
 ## Tech Stack
+
 - **Framework:** NestJS (v11)
 - **Database ORM:** Prisma
 - **Database:** PostgreSQL
@@ -25,13 +26,14 @@ This workspace is part of a monorepo. It's recommended to run the full applicati
    ```bash
    # Development mode
    npm run start:dev
-   
+
    # Production mode
    npm run build
    npm run start:prod
    ```
 
 ## API Endpoints (v1)
+
 By default, the API runs on `http://localhost:4000/api/v1`.
 
 - `POST /companies` - Create a new company
@@ -39,7 +41,9 @@ By default, the API runs on `http://localhost:4000/api/v1`.
 - `DELETE /companies/:id` - Delete a specific company by ID
 
 ## Testing
+
 Run the unit test suite (Jest):
+
 ```bash
 npm run test
 ```

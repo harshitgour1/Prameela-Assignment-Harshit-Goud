@@ -3,6 +3,7 @@
 This is the frontend application for the Prameela OneSuite company management system, built with [Next.js](https://nextjs.org/).
 
 ## Tech Stack
+
 - **Framework:** Next.js (App Router)
 - **Styling:** Tailwind CSS
 - **Components:** shadcn/ui & Base UI
@@ -10,6 +11,7 @@ This is the frontend application for the Prameela OneSuite company management sy
 - **Language:** TypeScript
 
 ## Features
+
 - Dynamic **Light / Dark Mode** support.
 - Fully responsive design featuring a standard Table view on desktop and an optimized **Card View** on mobile devices.
 - Real-time search, sorting, and pagination.
@@ -27,6 +29,7 @@ This workspace is part of a monorepo. It's recommended to run the full applicati
 3. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Environment Variables
+
 - `NEXT_PUBLIC_API_URL`: The URL of the NestJS backend API. If not set, it defaults to `http://localhost:4000/api/v1`.
 
 > **Note:** For full-stack setup instructions and Docker deployment, please refer to the [Root README](../../README.md).

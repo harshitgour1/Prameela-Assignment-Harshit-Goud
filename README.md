@@ -1,91 +1,172 @@
-# Prameela OneSuite - Company Directory Platform
+# Prameela OneSuite --- Company Directory
+
+A production-oriented full-stack Company Management System built for the
+Prameela OneSuite Full-Stack Developer technical assignment.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?style=for-the-badge&logo=nestjs)](https://nestjs.com/)
-[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
 
+## Live Demo
+
+| Application     | URL                                         |
+| :-------------- | :------------------------------------------ |
+| **Frontend**    | https://prameela-assignment-web.vercel.app/ |
+| **Backend API** | https://prameela-api.vercel.app/api/v1      |
+
+> The frontend is the primary entry point. The backend URL is provided
+> for API verification.
 
 ---
-## Live Links
-### Frontend - https://prameela-assignment-web.vercel.app/
-### Backend - https://prameela-api.vercel.app/api/v1
+
+## What It Does
+
+The application provides a focused company directory with:
+
+- Create company
+- Search companies by name
+- Paginated and sortable company listing
+- Delete company
+- Responsive desktop/tablet/mobile experience
+- Client and server-side validation
+- Loading, empty, error, and mutation states
+
+The implementation deliberately keeps the system as a **modular
+monolith**: simple enough for the domain, but structured with clear
+boundaries that can evolve as requirements grow.
+
 ---
 
-A premium, highly scalable, modular monolith full-stack application engineered for the Junior Full-Stack Developer Technical Assignment.
-
----
-
-## 1. High-Level System Architecture (HLD)
-
-The system leverages a heavily decoupled frontend/backend architecture operating within a unified monorepo to maximize developer velocity while maintaining strict boundaries.
+## Architecture
 
 ```mermaid
-graph TB
-    %% Styling
-    classDef frontend fill:#000000,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef backend fill:#E0234E,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef database fill:#336791,stroke:#fff,stroke-width:2px,color:#fff;
-    classDef infrastructure fill:#2496ED,stroke:#fff,stroke-width:2px,color:#fff;
+flowchart LR
+    U[User Browser]
+    W[Next.js Web App]
+    A[NestJS REST API]
+    P[Prisma ORM]
+    D[(PostgreSQL)]
 
-    %% Nodes
-    User((🧑‍💻 User Browser))
-    
-    subgraph "Docker Container Network"
-        UI[Next.js App Router UI]:::frontend
-        API[NestJS Core API]:::backend
-        DB[(PostgreSQL 16)]:::database
-    end
-
-    %% Flow
-    User -->|HTTPS Request| UI
-    UI -->|React Query Fetch| API
-    API -->|Prisma Client TCP| DB
+    U -->|HTTPS| W
+    W -->|REST / JSON| A
+    A --> P
+    P --> D
 ```
 
----
-
-## 2. API Request Lifecycle (Sequence Diagram)
-
-This demonstrates the exact flow of data when a user searches or paginates through the company directory.
+### Request lifecycle
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User
-    participant Browser as Next.js Client
-    participant RQ as React Query (Cache)
-    participant Controller as NestJS Controller
-    participant Service as NestJS Service
-    participant Prisma as Prisma ORM
+    participant Web as Next.js
+    participant Query as TanStack Query
+    participant API as NestJS
+    participant Service as Company Service
+    participant Prisma as Prisma
     participant DB as PostgreSQL
 
-    User->>Browser: Types in Search Bar
-    Browser->>RQ: useQuery(['companies', search])
-    
-    alt Cache Hit
-        RQ-->>Browser: Return cached data instantly
-    else Cache Miss
-        RQ->>Controller: GET /api/v1/companies?search=...
-        Controller->>Service: findAll(dto)
-        Service->>Prisma: findMany({ where, skip, take })
-        Prisma->>DB: SELECT * FROM "Company"
-        DB-->>Prisma: Result Set
-        Prisma-->>Service: Mapped Objects
-        Service-->>Controller: { data, meta }
-        Controller-->>RQ: 200 OK JSON
-        RQ-->>Browser: Update state
+    User->>Web: Search / paginate
+    Web->>Query: Update server-state query
+
+    alt Cached result
+        Query-->>Web: Cached data
+    else Request required
+        Query->>API: GET /api/v1/companies
+        API->>Service: Validate & process query
+        Service->>Prisma: Build database query
+        Prisma->>DB: Execute query
+        DB-->>Prisma: Results
+        Prisma-->>Service: Typed records
+        Service-->>API: data + metadata
+        API-->>Query: JSON response
+        Query-->>Web: Updated state
     end
-    Browser-->>User: Render updated UI table/cards
+
+    Web-->>User: Render results
+```
+
+### Backend boundary
+
+```text
+Controller
+    ↓
+Service
+    ↓
+Prisma
+    ↓
+PostgreSQL
+```
+
+### Frontend boundary
+
+```text
+UI Components
+    ↓
+React Query Hooks
+    ↓
+Typed API Client
+    ↓
+REST API
 ```
 
 ---
 
-## 3. Database Entity Relationship (LLD)
+## Tech Stack
 
-The core domain relies on a heavily constrained, index-optimized schema to ensure data integrity and fast searches.
+| Layer              | Technology               | Purpose                               |
+| :----------------- | :----------------------- | :------------------------------------ |
+| **Frontend**       | Next.js 15               | React application and routing         |
+| **UI**             | Tailwind CSS + shadcn/ui | Styling and accessible primitives     |
+| **Server State**   | TanStack Query           | Fetching, caching and synchronization |
+| **Forms**          | React Hook Form + Zod    | Form state and validation             |
+| **Backend**        | NestJS 11                | REST API and application structure    |
+| **ORM**            | Prisma 7                 | Type-safe persistence and migrations  |
+| **Database**       | PostgreSQL 16            | Relational persistence                |
+| **Testing**        | Jest / Vitest / RTL      | Unit, integration and UI testing      |
+| **Infrastructure** | Docker                   | Reproducible local environment        |
+| **CI**             | GitHub Actions           | Automated build and test validation   |
+
+---
+
+## Project Structure
+
+```text
+.
+├── apps/
+│   ├── api/
+│   │   ├── prisma/
+│   │   └── src/
+│   │       ├── companies/
+│   │       ├── common/
+│   │       └── main.ts
+│   │
+│   └── web/
+│       └── src/
+│           ├── app/
+│           ├── components/
+│           ├── hooks/
+│           └── lib/
+│
+
+├── .github/workflows/
+├── docker-compose.yml
+├── package.json
+└── README.md
+```
+
+The repository keeps frontend, backend, persistence, infrastructure, and
+engineering documentation clearly separated.
+
+---
+
+## Data Model
+
+The domain is intentionally small and currently consists of a single
+`companies` table.
 
 ```mermaid
 erDiagram
@@ -104,123 +185,299 @@ erDiagram
 
 ## 4. Comprehensive Technology Stack
 
-| Domain | Core Technology | Role & Purpose | Version |
-| :--- | :--- | :--- | :--- |
-| **Frontend Framework** | **Next.js (App Router)** | Provides Server-Side Rendering (SSR), layout management, and routing. | `15.x` |
-| **Data Fetching** | **TanStack Query** | Handles asynchronous state, aggressive caching, and pagination synchronization. | `5.x` |
-| **UI & Styling** | **Tailwind CSS + shadcn** | Utility-first CSS framework coupled with highly accessible radix-ui components. | `3.x` |
-| **Backend Framework** | **NestJS** | Enterprise-grade API framework utilizing strict Controller-Service-Module patterns. | `11.x` |
-| **Database ORM** | **Prisma ORM** | Provides type-safe database interactions and programmatic schema migrations. | `7.x` |
-| **Database Engine** | **PostgreSQL** | Robust relational persistence layer for complex, structured querying. | `16` |
-| **DevOps / CI** | **Docker + GitHub Actions** | Container orchestration for deployments and automated testing pipelines. | `Latest` |
+| Domain   | Core Technology  | Role & Purpose             | Version          |
+| :------- | :--------------- | :------------------------- | :--------------- |
+| `POST`   | `/companies`     | Create company             | `201 Created`    |
+| `GET`    | `/companies`     | List/search companies      | `200 OK`         |
+| `DELETE` | `/companies/:id` | Permanently delete company | `204 No Content` |
+
+The collection endpoint supports:
+
+```text
+?search=acme
+?page=1&limit=20
+?sortBy=createdAt&sortOrder=desc
+```
+
+These parameters can be combined.
+
+Example:
+
+```text
+GET /api/v1/companies?search=acme&page=1&limit=20&sortBy=companyName&sortOrder=asc
+```
+
+The API validates query parameters and uses an explicit allowlist for
+sortable fields.
 
 ---
 
-## 5. Monorepo Project Structure
+## UX & Responsive Design
 
-| Directory | Type | Description |
-| :--- | :--- | :--- |
-| `apps/web/` | **Next.js UI** | Contains all frontend React components, pages, hooks, and CSS. |
-| `apps/api/` | **NestJS API** | Contains backend controllers, services, DTOs, and Exception filters. |
-| `apps/api/prisma/` | **Database** | Houses `schema.prisma` definitions and generated SQL migrations. |
-| `.github/workflows/`| **CI/CD** | Contains the `ci.yml` pipeline that triggers on every push/PR. |
-| `docker-compose.yml`| **Infra** | The root orchestration file that binds Web, API, and Postgres together. |
+The UI is designed as a compact B2B management interface rather than a
+marketing page.
 
----
+### Desktop
 
-## 6. Setup & Installation Guide
+Companies are presented in a semantic data table for fast scanning and
+comparison.
 
-### Option A: The Docker Route (Highly Recommended)
-Launch the entire ecosystem with zero manual configuration.
+### Mobile
 
-- **Step 1:** Ensure **Docker Desktop** is running.
-- **Step 2:** Clone this repository.
-- **Step 3:** Build and initialize the network:
-  ```bash
-  docker-compose up --build
-  ```
-- **Step 4:** Launch the **Frontend**: [http://localhost:3000](http://localhost:3000)
-- **Step 5:** Monitor the **Backend API**: [http://localhost:4000/api/v1](http://localhost:4000/api/v1)
+The table becomes a purpose-designed stacked card layout instead of
+forcing a wide desktop table into a narrow viewport.
 
-### Option B: The Local Development Route (Node & npm)
-For granular control, debugging, and Hot Module Replacement (HMR).
+### Designed states
 
-- **Step 1:** Install all monorepo dependencies:
-  ```bash
-  npm install
-  ```
-- **Step 2:** Spin up just the PostgreSQL container:
-  ```bash
-  docker-compose up postgres -d
-  ```
-- **Step 3:** Generate types and apply database schemas:
-  ```bash
-  cd apps/api
-  npx prisma generate
-  npx prisma migrate deploy
-  cd ../..
-  ```
-- **Step 4:** Boot the **NestJS Backend**:
-  ```bash
-  npm run start:dev --workspace=apps/api
-  ```
-- **Step 5:** Boot the **Next.js Frontend**:
-  ```bash
-  npm run dev --workspace=apps/web
-  ```
+- Initial loading / skeleton
+- Background loading
+- Empty database
+- No search results
+- Fetch error + retry
+- Create validation errors
+- Create pending/success/failure
+- Delete confirmation
+- Delete pending/success/failure
+
+Accessibility is treated as part of the component design, including
+semantic markup, keyboard navigation, visible focus states, accessible
+dialogs/forms, reduced-motion support, and non-color-only status
+communication.
 
 ---
 
-## 7. RESTful API Endpoints
+## Local Development
 
-The backend exposes a highly standardized REST API. 
+### Prerequisites
 
-| Method | Endpoint | Payload / Query Params | Expected Response | Description |
-| :--- | :--- | :--- | :--- | :--- |
-| **POST** | `/api/v1/companies` | `{ companyName, website, ... }` | `201 Created` (Company Obj) | Creates a new company entry. |
-| **GET** | `/api/v1/companies` | `?page=1&limit=10&search=Acme` | `200 OK` `{ data, meta }` | Returns paginated & filtered list. |
-| **DELETE** | `/api/v1/companies/:id`| URL Param: `id` (UUID) | `200 OK` (Deleted Obj) | Deletes a company permanently. |
+- Node.js `>=22.12.0`
+- npm `>=10`
+- Docker
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/harshitgour1/Prameela-Assignment-Harshit-Goud.git
+cd Prameela-Assignment-Harshit-Goud
+npm ci
+```
+
+### 2. Configure environment
+
+Create the required environment files using the provided `.env.example`
+files.
+
+Backend:
+
+```env
+DATABASE_URL=
+PORT=
+CORS_ORIGIN=
+```
+
+Frontend:
+
+```env
+NEXT_PUBLIC_API_URL=
+```
+
+Do not commit real secrets.
+
+### 3. Start PostgreSQL
+
+```bash
+docker compose up -d postgres
+```
+
+### 4. Prepare Prisma
+
+```bash
+npx prisma generate --schema apps/api/prisma/schema.prisma
+npx prisma migrate dev --schema apps/api/prisma/schema.prisma
+```
+
+### 5. Start the applications
+
+Backend:
+
+```bash
+npm run dev --workspace=apps/api
+```
+
+Frontend:
+
+```bash
+npm run dev --workspace=apps/web
+```
 
 ---
 
-## 8. Environment Configuration
+## Docker
 
-Every workspace operates within its own secure environment boundary.
+For a containerized local setup:
 
-| Workspace | Variable Name | Required | Default / Example | Purpose |
-| :--- | :--- | :---: | :--- | :--- |
-| `apps/api` | `DATABASE_URL` | **Yes** | `postgresql://...` | Connects NestJS to PostgreSQL. |
-| `apps/api` | `PORT` | No | `4000` | Defines the API listening port. |
-| `apps/api` | `CORS_ORIGIN` | No | `http://localhost:3000` | Locks down cross-origin requests. |
-| `apps/api` | `RENDER_EXTERNAL_URL` | No | *(Empty)* | Enables an automated 14-minute self-ping to prevent free-tier shutdowns. |
-| `apps/web` | `NEXT_PUBLIC_API_URL` | No | `http://localhost:4000/api/v1` | Instructs the frontend where to route API calls. |
+```bash
+docker compose up --build
+```
 
----
-
-## 9. Architectural Assumptions
-
-- **Pagination Approach:** 
-  - Implemented **Offset-based pagination** (using Prisma's `skip` and `take`) instead of cursor-based pagination. This assumes a moderate dataset where the complexity overhead of cursors is unnecessary.
-- **Security Posture:** 
-  - Assumed an MVP (Minimum Viable Product) state requiring no JWT/OAuth user authentication. Endpoints intentionally remain public for immediate testing simplicity.
-- **Mobile User Experience (UX):** 
-  - Assumed standard HTML tables provide a poor, horizontal-scrolling experience on mobile devices. 
-  - Actively replaced traditional tables with an industry-standard, fully responsive stacked **Card View** on mobile breakpoints.
+Docker is primarily used to make the local database/development
+environment reproducible without requiring a manually installed
+PostgreSQL server.
 
 ---
 
-## 10. Known Limitations
+## Quality Checks
 
-- **Bulk Deletion Scalability:** 
-  - The UI currently supports bulk deletion via checkboxes. However, selecting and deleting *tens of thousands* of rows simultaneously might exceed standard HTTP URL length limits if passed incorrectly.
-- **Search Latency on Large Datasets:** 
-  - The search functionality relies on a basic SQL `ILIKE` clause. Devoid of a dedicated full-text search index (e.g., the Postgres `pg_trgm` extension), query performance may experience slight degradation on massive datasets.
+Run the project checks from the repository root:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+```
+
+The repository also includes GitHub Actions for automated validation.
 
 ---
 
-## 11. Future Roadmap
+## Testing
 
-- **Authentication (JWT Guards):** Implement strict Authorization Guards in NestJS to restrict database write/delete operations solely to authenticated administrators.
-- **React Server Components (RSC):** Migrate baseline data fetching directly to the server within the Next.js App Router to vastly reduce client-side JavaScript payloads and improve SEO.
-- **Optimistic UI Updates:** Integrate React Query `onMutate` properties to provide instantaneous, zero-latency visual feedback during company creation and deletion.
-- **Automated Mock Seeding:** Introduce `Faker.js` scripts to instantly populate the database with 10,000+ realistic mock data rows upon initial deployment for load testing.
+The project uses multiple levels of testing:
+
+```text
+Unit / Service Tests
+        ↓
+API E2E Tests
+        ↓
+Frontend Behaviour Tests
+```
+
+API E2E tests exercise the real application path through NestJS, Prisma,
+and PostgreSQL rather than mocking the entire persistence layer.
+
+The focus is on meaningful behavior and failure cases rather than
+coverage numbers alone.
+
+---
+
+## Deployment
+
+The project is structured as a monorepo with independently deployable
+frontend and backend applications.
+
+```text
+                Internet
+                   │
+          ┌────────┴────────┐
+          ▼                 ▼
+       Vercel            Vercel
+      Next.js         NestJS API
+                             │
+                             ▼
+                        PostgreSQL
+```
+
+The production URLs are listed at the top of this README.
+
+Deployment configuration is kept separate from application code, with
+environment variables used for runtime configuration.
+
+---
+
+## Engineering Decisions
+
+A few deliberate choices are worth calling out:
+
+### Modular monolith
+
+The domain does not justify microservices or distributed infrastructure.
+A modular monolith keeps deployment and development simple while
+preserving clear application boundaries.
+
+### Server-side search
+
+Search is executed in PostgreSQL instead of downloading the entire
+dataset into the browser. PostgreSQL trigram indexing provides a
+practical optimization for substring matching.
+
+### Offset pagination
+
+The company directory is an administrative/table-oriented interface, so
+page/limit pagination is a better fit than cursor pagination.
+
+### Server as source of truth
+
+Create and delete mutations invalidate/refetch the relevant server state
+rather than maintaining a second independent copy of the database state
+in the browser.
+
+### Validation at both boundaries
+
+Frontend validation provides immediate feedback; backend validation
+remains authoritative because the API must not trust any client.
+
+---
+
+## Known Scope & Limitations
+
+The assignment intentionally does not require:
+
+- authentication/authorization
+- company editing
+- soft deletion
+- audit logging
+- real-time updates
+- dedicated search infrastructure
+
+The current implementation therefore avoids these features rather than
+introducing complexity without a requirement.
+
+For substantially larger datasets or significantly more advanced search
+requirements, PostgreSQL query/index performance should be measured and
+the search strategy evolved based on actual workload.
+
+---
+
+## Documentation
+
+Detailed engineering decisions are documented separately:
+
+- `00-tech-stack-decisions.md`
+- `01-architecture-hld.md`
+- `02-low-level-design.md`
+- `03-api-specification.md`
+- `04-database-design.md`
+- `05-testing-strategy.md`
+- `06-cicd-deployment.md`
+- `07-project-plan.md`
+- UI/UX Design Specification
+
+These documents contain the deeper architecture, implementation,
+testing, deployment, and UX rationale behind the project.
+Not commited in this repo, can be provided upon request.
+
+---
+
+## AI Usage
+
+AI tools were used as engineering assistants during development.
+
+[`AI_USAGE.md`](./AI_USAGE.md) documents:
+
+- tools used
+- where and why they were used
+- representative prompts
+- generated code retained
+- generated code modified
+- generated code rejected
+
+AI-assisted code was reviewed, tested, and integrated deliberately. The
+final implementation remains the responsibility of the developer.
+
+---
+
+## Repository
+
+[GitHub
+Repository](https://github.com/harshitgour1/Prameela-Assignment-Harshit-Goud)
