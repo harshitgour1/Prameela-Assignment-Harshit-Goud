@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { HttpExceptionFilter } from '../src/common/filters/http-exception.filter';
@@ -48,9 +48,10 @@ describe('CompaniesController (e2e)', () => {
       })
       .expect(201);
 
-    expect(res.body.data).toHaveProperty('id');
-    expect(res.body.data.companyName).toBe('Acme Test Corp');
-    createdId = res.body.data.id;
+    const body = res.body as { data: Record<string, unknown> };
+    expect(body.data).toHaveProperty('id');
+    expect(body.data.companyName).toBe('Acme Test Corp');
+    createdId = body.data.id as string;
   });
 
   it('/companies (POST) - invalid', async () => {
@@ -64,7 +65,8 @@ describe('CompaniesController (e2e)', () => {
       })
       .expect(400);
 
-    expect(res.body.message).toEqual(
+    const body = res.body as { message: string[] };
+    expect(body.message).toEqual(
       expect.arrayContaining([
         expect.stringContaining('website'),
         expect.stringContaining('employeeCount'),
@@ -78,10 +80,14 @@ describe('CompaniesController (e2e)', () => {
       .get('/companies?search=Acme')
       .expect(200);
 
-    expect(res.body.data).toBeInstanceOf(Array);
-    expect(res.body.data.length).toBeGreaterThan(0);
-    expect(res.body.data[0].companyName).toBe('Acme Test Corp');
-    expect(res.body.meta.totalItems).toBeGreaterThan(0);
+    const body = res.body as {
+      data: Record<string, unknown>[];
+      meta: { totalItems: number };
+    };
+    expect(body.data).toBeInstanceOf(Array);
+    expect(body.data.length).toBeGreaterThan(0);
+    expect(body.data[0].companyName).toBe('Acme Test Corp');
+    expect(body.meta.totalItems).toBeGreaterThan(0);
   });
 
   it('/companies (GET) - pagination', async () => {
@@ -89,13 +95,19 @@ describe('CompaniesController (e2e)', () => {
       .get('/companies?page=1&limit=1')
       .expect(200);
 
-    expect(res.body.data.length).toBeLessThanOrEqual(1);
-    expect(res.body.meta.limit).toBe(1);
-    expect(res.body.meta.page).toBe(1);
+    const body = res.body as {
+      data: Record<string, unknown>[];
+      meta: { limit: number; page: number };
+    };
+    expect(body.data.length).toBeLessThanOrEqual(1);
+    expect(body.meta.limit).toBe(1);
+    expect(body.meta.page).toBe(1);
   });
 
   it('/companies/:id (DELETE) - existing', async () => {
-    await request(app.getHttpServer()).delete(`/companies/${createdId}`).expect(204);
+    await request(app.getHttpServer())
+      .delete(`/companies/${createdId}`)
+      .expect(204);
 
     // Verify it's gone
     const check = await prisma.company.findUnique({ where: { id: createdId } });
