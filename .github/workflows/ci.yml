@@ -20,7 +20,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -49,12 +49,13 @@ jobs:
         run: npm run typecheck
 
       - name: Run API Unit Tests
-        run: npm run test --workspace=apps/api
+        run: npm run test
+        working-directory: apps/api
 
       - name: Run API E2E Tests
         run: |
           npx prisma migrate deploy
-          npm run test:e2e --workspace=apps/api
+          npm run test:e2e
         working-directory: apps/api
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/companies
