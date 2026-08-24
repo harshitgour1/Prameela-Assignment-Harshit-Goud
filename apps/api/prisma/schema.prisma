@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Company {
+  id            String   @id @default(uuid()) @db.Uuid
+  companyName   String   @map("company_name") @db.VarChar(200)
+  website       String   @db.VarChar(255)
+  industry      String   @db.VarChar(100)
+  employeeCount Int      @map("employee_count")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([createdAt])
+  @@map("companies")
+}
