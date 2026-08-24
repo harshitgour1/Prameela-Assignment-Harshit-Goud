@@ -5,6 +5,7 @@ As requested, this document outlines how AI-assisted development tools were used
 ### 1. Which AI tools were used
 
 - **Antigravity** (Google DeepMind's Agentic Coding Assistant)
+- **Claude** (Logic and flow explanations)
 - **ChatGPT / Codex** (for general logic exploration)
 
 ### 2. Where AI was used
