@@ -13,6 +13,6 @@ export function useCreateCompany() {
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to create company');
-    }
+    },
   });
 }

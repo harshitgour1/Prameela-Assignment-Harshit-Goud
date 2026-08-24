@@ -13,6 +13,6 @@ export function useDeleteCompany() {
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to delete company');
-    }
+    },
   });
 }

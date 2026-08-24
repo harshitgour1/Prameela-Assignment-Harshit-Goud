@@ -16,6 +16,6 @@ export function useBulkDeleteCompanies() {
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : 'Failed to delete companies');
-    }
+    },
   });
 }

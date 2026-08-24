@@ -12,11 +12,16 @@ export function ThemeToggle() {
 
   // Prevent hydration mismatch
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
   if (!mounted) {
-    return <Button variant="outline" size="icon" className="h-9 w-9 border-border bg-background"><span className="sr-only">Toggle theme</span></Button>;
+    return (
+      <Button variant="outline" size="icon" className="h-9 w-9 border-border bg-background">
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
   }
 
   return (

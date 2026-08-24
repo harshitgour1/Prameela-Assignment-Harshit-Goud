@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1
 
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_URL}${endpoint}`;
-  
+
   const headers = new Headers(options.headers);
   if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
@@ -23,7 +23,7 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
     throw new ApiError(
       data?.statusCode || response.status,
       data?.error || response.statusText,
-      Array.isArray(data?.message) ? data.message : [data?.message || 'Something went wrong']
+      Array.isArray(data?.message) ? data.message : [data?.message || 'Something went wrong'],
     );
   }
 
