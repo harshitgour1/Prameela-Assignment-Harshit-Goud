@@ -32,9 +32,7 @@ export class CompaniesService {
         where,
         skip,
         take: limit,
-        orderBy: {
-          [sortBy]: sortOrder,
-        },
+        orderBy: [{ [sortBy]: sortOrder }, { id: 'asc' }],
       }),
       this.prisma.company.count({ where }),
     ]);
@@ -56,7 +54,10 @@ export class CompaniesService {
         where: { id },
       });
     } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
         throw new NotFoundException(`Company with id ${id} not found`);
       }
       throw error;
