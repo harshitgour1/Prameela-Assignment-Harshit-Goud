@@ -1,4 +1,4 @@
-# 🏢 Prameela OneSuite - Company Directory Platform
+# Prameela OneSuite - Company Directory Platform
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?style=for-the-badge&logo=nestjs)](https://nestjs.com/)
@@ -7,11 +7,18 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
 
+
+---
+## Live Links
+### Frontend - https://prameela-assignment-web.vercel.app/
+### Backend - https://prameela-api.vercel.app/api/v1
+---
+
 A premium, highly scalable, modular monolith full-stack application engineered for the Junior Full-Stack Developer Technical Assignment.
 
 ---
 
-## 🏗️ 1. High-Level System Architecture (HLD)
+## 1. High-Level System Architecture (HLD)
 
 The system leverages a heavily decoupled frontend/backend architecture operating within a unified monorepo to maximize developer velocity while maintaining strict boundaries.
 
@@ -40,7 +47,7 @@ graph TB
 
 ---
 
-## 🔄 2. API Request Lifecycle (Sequence Diagram)
+## 2. API Request Lifecycle (Sequence Diagram)
 
 This demonstrates the exact flow of data when a user searches or paginates through the company directory.
 
@@ -76,7 +83,7 @@ sequenceDiagram
 
 ---
 
-## 🗄️ 3. Database Entity Relationship (LLD)
+## 3. Database Entity Relationship (LLD)
 
 The core domain relies on a heavily constrained, index-optimized schema to ensure data integrity and fast searches.
 
@@ -95,7 +102,7 @@ erDiagram
 
 ---
 
-## 🛠️ 4. Comprehensive Technology Stack
+## 4. Comprehensive Technology Stack
 
 | Domain | Core Technology | Role & Purpose | Version |
 | :--- | :--- | :--- | :--- |
@@ -109,7 +116,7 @@ erDiagram
 
 ---
 
-## 📂 5. Monorepo Project Structure
+## 5. Monorepo Project Structure
 
 | Directory | Type | Description |
 | :--- | :--- | :--- |
@@ -121,7 +128,7 @@ erDiagram
 
 ---
 
-## 🚀 6. Setup & Installation Guide
+## 6. Setup & Installation Guide
 
 ### Option A: The Docker Route (Highly Recommended)
 Launch the entire ecosystem with zero manual configuration.
@@ -164,7 +171,7 @@ For granular control, debugging, and Hot Module Replacement (HMR).
 
 ---
 
-## 🔌 7. RESTful API Endpoints
+## 7. RESTful API Endpoints
 
 The backend exposes a highly standardized REST API. 
 
@@ -176,7 +183,7 @@ The backend exposes a highly standardized REST API.
 
 ---
 
-## ⚙️ 8. Environment Configuration
+## 8. Environment Configuration
 
 Every workspace operates within its own secure environment boundary.
 
@@ -190,7 +197,7 @@ Every workspace operates within its own secure environment boundary.
 
 ---
 
-## 🧠 9. Architectural Assumptions
+## 9. Architectural Assumptions
 
 - **Pagination Approach:** 
   - Implemented **Offset-based pagination** (using Prisma's `skip` and `take`) instead of cursor-based pagination. This assumes a moderate dataset where the complexity overhead of cursors is unnecessary.
@@ -202,7 +209,7 @@ Every workspace operates within its own secure environment boundary.
 
 ---
 
-## ⚠️ 10. Known Limitations
+## 10. Known Limitations
 
 - **Bulk Deletion Scalability:** 
   - The UI currently supports bulk deletion via checkboxes. However, selecting and deleting *tens of thousands* of rows simultaneously might exceed standard HTTP URL length limits if passed incorrectly.
@@ -211,7 +218,7 @@ Every workspace operates within its own secure environment boundary.
 
 ---
 
-## 🔮 11. Future Roadmap
+## 11. Future Roadmap
 
 - **Authentication (JWT Guards):** Implement strict Authorization Guards in NestJS to restrict database write/delete operations solely to authenticated administrators.
 - **React Server Components (RSC):** Migrate baseline data fetching directly to the server within the Next.js App Router to vastly reduce client-side JavaScript payloads and improve SEO.
