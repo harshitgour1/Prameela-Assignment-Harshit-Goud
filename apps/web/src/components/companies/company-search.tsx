@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 
 interface CompanySearchProps {
   defaultValue?: string;
@@ -13,12 +12,13 @@ export function CompanySearch({ defaultValue = '', onSearch }: CompanySearchProp
 
   // Sync internal state if URL changes externally
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setValue(defaultValue);
   }, [defaultValue]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      // Only trigger onSearch if the value actually changed from the defaultValue 
+      // Only trigger onSearch if the value actually changed from the defaultValue
       // (prevents double fetching on mount)
       if (value !== defaultValue) {
         onSearch(value);

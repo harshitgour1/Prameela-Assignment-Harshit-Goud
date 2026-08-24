@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useTransition, useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCompanies } from '@/hooks/use-companies';
 import { CompanyTable } from '@/components/companies/company-table';
@@ -13,7 +13,6 @@ function CompaniesContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-  const [isPending, startTransition] = useTransition();
 
   const search = searchParams.get('search') || '';
   const parsedPage = parseInt(searchParams.get('page') || '1', 10);
@@ -90,10 +89,7 @@ function CompaniesContent() {
         />
         {data?.meta && (
           <div className="p-4 border-t border-border flex justify-end">
-            <CompanyPagination
-              meta={data.meta}
-              onPageChange={handlePageChange}
-            />
+            <CompanyPagination meta={data.meta} onPageChange={handlePageChange} />
           </div>
         )}
       </div>
@@ -107,7 +103,9 @@ export default function CompaniesPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Companies</h1>
-          <p className="text-sm text-muted-foreground">Manage your company directory and details.</p>
+          <p className="text-sm text-muted-foreground">
+            Manage your company directory and details.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <CreateCompanyDialog />
