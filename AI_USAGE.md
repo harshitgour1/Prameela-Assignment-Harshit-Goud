@@ -2,6 +2,8 @@
 
 As requested, this document outlines how AI-assisted development tools were used to build this application.
 
+> **Note**: The Actual Prompts are Big in length and contains deep information and classified tasks. I can provide them if you want that too.
+
 ### 1. Which AI tools were used
 
 - **Antigravity** (Google DeepMind's Agentic Coding Assistant)
